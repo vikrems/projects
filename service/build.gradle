@@ -1,0 +1,19 @@
+dependencies {
+    implementation project(":persistence")
+    implementation project(":aggregate")
+
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "joda-time:joda-time:${jodaTimeVersion}"
+    implementation "org.hibernate.validator:hibernate-validator:${hibernateValidatorVersion}"
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+
+}
+
+jar {
+    enabled = true
+}
+
+bootJar {
+    enabled = false
+}

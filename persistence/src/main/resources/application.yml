@@ -1,0 +1,2 @@
+env:
+  name: ${DYNAMODB_ENV_PREFIX:dev-}

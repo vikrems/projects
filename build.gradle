@@ -1,0 +1,43 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.3.RELEASE' apply(false)
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE' apply(false)
+    id 'java'
+    id 'java-library'
+    id "io.freefair.lombok" version "5.2.1"
+}
+
+group = 'com.ecom.poc'
+version = '0.0.1-SNAPSHOT'
+
+ext {
+    awsDynamoDbVersion = '1.11.862'
+    junitVersion = '5.6.0'
+    mockitoVersion = '3.5.10'
+    jodaTimeVersion = '2.10.6'
+    reactorTest = '3.3.9.RELEASE'
+    awatilityVersion = '3.0.0'
+    jacksonVersion = '2.0.1'
+    hibernateValidatorVersion = '7.0.1.Final'
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'io.freefair.lombok'
+
+    test {
+        useJUnitPlatform()
+    }
+
+    dependencies {
+        testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.0')
+        testImplementation('org.junit.jupiter:junit-jupiter-api:5.6.0')
+    }
+}

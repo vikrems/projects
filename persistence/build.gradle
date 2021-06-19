@@ -1,0 +1,14 @@
+dependencies {
+    implementation project(":aggregate")
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation "joda-time:joda-time:${jodaTimeVersion}"
+    implementation "com.amazonaws:aws-java-sdk-dynamodb:${awsDynamoDbVersion}"
+}
+
+jar {
+    enabled = true
+}
+
+bootJar {
+    enabled = false
+}

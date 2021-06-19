@@ -1,0 +1,12 @@
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_URL:localhost:9092}
+    consumer:
+      enable-auto-commit: false
+      properties:
+        topic: com.ecommerce.cart.inventory
+        group: s_cart
+server:
+  port: 8079
+  servlet:
+    context-path: /amazon
