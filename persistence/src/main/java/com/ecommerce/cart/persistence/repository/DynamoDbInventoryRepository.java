@@ -18,7 +18,8 @@ public class DynamoDbInventoryRepository implements InventoryRepository {
 
     @Override
     public Optional<InventoryItem> findById(String id) {
-        InventoryItem inventoryItem = dynamoDBMapper.load(InventoryItem.class, id, id);
+        DbEntity dbEntity = dynamoDBMapper.load(DbEntity.class, id, id);
+        InventoryItem inventoryItem = domainToDbEntity.dbEntityToInventoryItem(dbEntity);
         return Optional.ofNullable(inventoryItem);
     }
 

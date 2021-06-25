@@ -3,31 +3,28 @@ package com.ecommerce.cart.persistence.mapper;
 import com.ecommerce.cart.aggregate.inventory.InventoryItem;
 import com.ecommerce.cart.aggregate.scart.Cart;
 import com.ecommerce.cart.aggregate.scart.LineItem;
-import com.ecommerce.cart.aggregate.vo.Quantity;
 import com.ecommerce.cart.persistence.entity.DbEntity;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
 import java.util.function.Function;
-
-import static java.util.stream.Collectors.toList;
+import java.util.stream.Collectors;
 
 @Component
 public class DomainToDbEntity {
 
     private static final int BOUND = 10;
 
-    public DbEntity cartToDbEntity(Cart cart) {
-        return DbEntity
-                .builder()
-                .partitionKey(cart.getCartId())
-                .sortKey(cart.getCartId())
-                .gsiKey(new Random().nextInt(BOUND))
-                .createdTime(DateTime.now())
-                .build();
-    }
+//    public List<DbEntity> cartToDbEntity(Cart cart) {
+//        DbEntity cartEntity = DbEntity
+//                .builder()
+//                .partitionKey(cart.getCartId())
+//                .sortKey(cart.getCartId())
+//                .gsiKey(new Random().nextInt(BOUND))
+//                .lastUpdatedTime(DateTime.now())
+//                .build();
+//    }
 
     public DbEntity lineItemToDbEntity(Cart cart, LineItem lineItem) {
         return DbEntity
@@ -41,12 +38,12 @@ public class DomainToDbEntity {
     }
 
     public Cart dbEntityToCart(List<DbEntity> dbEntityList) {
-        List<LineItem> lineItems = dbEntityList.stream()
+        Map<String, LineItem> lineItems = dbEntityList.stream()
                 .filter(dbEntity -> !dbEntity.getPartitionKey().equals(dbEntity.getSortKey()))
                 .map(lineItemMapper)
-                .collect(toList());
+                .collect(Collectors.toMap(LineItem::getItemId, Function.identity()));
         String cartId = dbEntityList.get(0).getPartitionKey();
-        return new Cart(cartId, lineItems);
+        return Cart.createNewCart(cartId, lineItems);
     }
 
     public DbEntity inventoryToDbEntity(InventoryItem inventoryItem) {
@@ -59,10 +56,16 @@ public class DomainToDbEntity {
                 .build();
     }
 
+    public InventoryItem dbEntityToInventoryItem(DbEntity dbEntity) {
+        return new InventoryItem(dbEntity.getPartitionKey(),
+                dbEntity.getName(),
+                dbEntity.getPrice(),
+                dbEntity.getQuantity());
+    }
 
     private final Function<DbEntity, LineItem> lineItemMapper = dbEntity ->
-            new LineItem(dbEntity.getSortKey(),
+            LineItem.createLineItemFromDb(dbEntity.getSortKey(),
                     dbEntity.getName(),
                     dbEntity.getPrice(),
-                    new Quantity(dbEntity.getQuantity()));
+                    dbEntity.getQuantity());
 }

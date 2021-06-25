@@ -16,7 +16,7 @@ public class ResponseDto {
 
     @Getter
     @RequiredArgsConstructor
-    private static class ItemDto {
+    public static class ItemDto {
         private final String itemId;
         private final String name;
         private final BigDecimal price;

@@ -1,18 +1,17 @@
 package com.ecommerce.cart.aggregate.inventory;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Getter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class InventoryItem {
 
-    private final String itemId;
-    private final String name;
-    private final BigDecimal price;
-    private final int quantity;
+    private String itemId;
+    private String name;
+    private BigDecimal price;
+    private int quantity;
 }

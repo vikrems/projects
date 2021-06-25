@@ -3,17 +3,18 @@ package com.ecommerce.cart.service.cart;
 import com.ecommerce.cart.aggregate.inventory.InventoryItem;
 import com.ecommerce.cart.aggregate.scart.Cart;
 import com.ecommerce.cart.aggregate.scart.LineItem;
-import com.ecommerce.cart.aggregate.vo.Quantity;
 import com.ecommerce.cart.persistence.repository.CartRepository;
 import com.ecommerce.cart.persistence.repository.InventoryRepository;
 import com.ecommerce.cart.service.dto.RequestDto;
+import com.ecommerce.cart.service.dto.ResponseDto;
 import com.ecommerce.cart.service.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,36 +23,53 @@ public class CartService {
     private final InventoryRepository inventoryRepository;
     private final CartRepository cartRepository;
 
-    public boolean upsertCart(String cartId, RequestDto requestDto) {
-        List<LineItem> lineItems = validateInventoryAvailability(requestDto);
-        Optional<Cart> cartOptional = cartRepository.findByCartId(cartId);
-        Cart cart;
-        if (cartOptional.isEmpty()) {
-            cart = new Cart(cartId, lineItems);
-            cartRepository.saveCart(cart);
-            return true;
-        }
-        cart = cartOptional.get();
-        cart.addItems(lineItems);
+    public void upsertCart(String cartId, RequestDto requestDto) {
+        Map<String, LineItem> lineItems = validateInventoryAvailability(requestDto);
+        Cart cart = Cart.createNewCart(cartId, lineItems);
         cartRepository.saveCart(cart);
-        return false;
     }
 
-    private List<LineItem> validateInventoryAvailability(RequestDto requestDto) {
-        List<LineItem> lineItems = new LinkedList<>();
+    public void addToCart(String cartId, RequestDto requestDto) {
+        Cart cart = cartRepository.findByCartId(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart with ID " + cartId + " is not available"));
+        Map<String, LineItem> lineItems = validateInventoryAvailability(requestDto);
+        cart.mergeItems(lineItems);
+        cartRepository.saveCart(cart);
+    }
+
+    public ResponseDto retrieveCart(String cartId) {
+        Cart cart = cartRepository.findByCartId(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart with ID " + cartId + " is not available"));
+       return createResponseDto(cart);
+    }
+
+    private Map<String, LineItem> validateInventoryAvailability(RequestDto requestDto) {
+        Map<String, LineItem> lineItemMap = new HashMap<>();
         for (RequestDto.RequestItemDto eachReqItem : requestDto.getItems()) {
             String itemId = eachReqItem.getItemId();
             InventoryItem inventoryItem = inventoryRepository.findById(itemId)
                     .orElseThrow(() -> new ResourceNotFoundException("Invalid product Id " + itemId));
-            if (inventoryItem.getQuantity() < eachReqItem.getQuantity())
-                throw new RuntimeException("Requested quantity " + eachReqItem.getQuantity() +
-                        " is not available for the product with id:" + eachReqItem.getItemId());
-            lineItems.add(new LineItem(inventoryItem.getItemId(),
+            lineItemMap.put(itemId, LineItem.createLineItemFromApi(inventoryItem.getItemId(),
                     inventoryItem.getName(),
                     inventoryItem.getPrice(),
-                    new Quantity(inventoryItem.getQuantity())));
+                    eachReqItem.getQuantity(),
+                    inventoryItem.getQuantity()));
         }
+        return lineItemMap;
+    }
 
-        return lineItems;
+    private ResponseDto createResponseDto(Cart cart) {
+        List<ResponseDto.ItemDto> itemDtos = cart.getItems()
+                .values()
+                .stream()
+                .map(lItem -> new ResponseDto.ItemDto(lItem.getItemId(),
+                        lItem.getName(),
+                        lItem.getPrice(),
+                        lItem.getQuantity().getValue()))
+                .collect(Collectors.toList());
+
+        return new ResponseDto(cart.getTotalPrice().getValue(),
+                cart.getTotalQuantity().getValue(),
+                itemDtos);
     }
 }

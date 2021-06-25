@@ -36,7 +36,7 @@ public class DbEntity {
 
     @DynamoDBIndexRangeKey(globalSecondaryIndexName = "GSIndex")
     @DynamoDBTypeConvertedEpochDate
-    private DateTime createdTime;
+    private DateTime lastUpdatedTime;
 
     private DbEntity(String partitionKey) {
         this.partitionKey = partitionKey;
