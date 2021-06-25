@@ -39,7 +39,7 @@ public class Quantity {
 
     private void validateQuantity(int quantity) {
         if (quantity < 1 || quantity > MAX_QUANTITY) {
-            throw new InvariantViolationException("Shopping cart can have between 0 and 20 items");
+            throw new InvariantViolationException("Shopping cart can have between 1 and 20 items");
         }
     }
 }

@@ -15,7 +15,7 @@ public class RequestDto {
 
         private String itemId;
 
-        @Range(min = 0, max = 20, message = "Quantity must be between 0 and 20")
+        @Range(min = 1, max = 20, message = "Quantity must be between 1 and 20")
         private int quantity;
     }
 }

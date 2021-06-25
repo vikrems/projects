@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 public class Price {
 
     private final BigDecimal value;
-    private static final BigDecimal MAX_PRICE = new BigDecimal(1000);
+    private static final BigDecimal MAX_PRICE = new BigDecimal(300);
 
     public Price() {
         value = new BigDecimal(0);
@@ -20,7 +20,7 @@ public class Price {
     public Price incrementPrice(BigDecimal increment, int scale) {
         BigDecimal totalIncrement = increment.multiply(new BigDecimal(scale));
         BigDecimal newValue = this.value.add(totalIncrement);
-        if (value.compareTo(MAX_PRICE) > 0)
+        if (newValue.compareTo(MAX_PRICE) > 0)
             throw new InvariantViolationException("Max price on the shopping cart is 1000, " +
                     "you're price is " + newValue);
 
