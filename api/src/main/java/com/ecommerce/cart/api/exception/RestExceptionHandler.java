@@ -1,6 +1,6 @@
 package com.ecommerce.cart.api.exception;
 
-import com.ecommerce.cart.aggregate.exception.InvariantViolationException;
+import com.ecommerce.cart.aggregate.exception.PriceExceededException;
 import com.ecommerce.cart.service.exception.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,8 +18,8 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorResponse, NOT_FOUND);
     }
 
-    @ExceptionHandler(InvariantViolationException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(InvariantViolationException ex) {
+    @ExceptionHandler(PriceExceededException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(PriceExceededException ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
         return new ResponseEntity<>(errorResponse, CONFLICT);
     }

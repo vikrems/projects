@@ -1,6 +1,6 @@
 package com.ecommerce.cart.aggregate.vo;
 
-import com.ecommerce.cart.aggregate.exception.InvariantViolationException;
+import com.ecommerce.cart.aggregate.exception.PriceExceededException;
 
 import java.math.BigDecimal;
 
@@ -21,7 +21,7 @@ public class Price {
         BigDecimal totalIncrement = increment.multiply(new BigDecimal(scale));
         BigDecimal newValue = this.value.add(totalIncrement);
         if (newValue.compareTo(MAX_PRICE) > 0)
-            throw new InvariantViolationException("Max price on the shopping cart is 1000, " +
+            throw new PriceExceededException("Max price on the shopping cart is 1000, " +
                     "you're price is " + newValue);
 
         return new Price(newValue);

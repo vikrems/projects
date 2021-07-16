@@ -2,7 +2,7 @@ package com.ecommerce.cart.service.cart;
 
 import com.ecommerce.cart.aggregate.inventory.InventoryItem;
 import com.ecommerce.cart.aggregate.scart.Cart;
-import com.ecommerce.cart.aggregate.scart.LineItem;
+import com.ecommerce.cart.aggregate.scart.CartItem;
 import com.ecommerce.cart.persistence.repository.CartRepository;
 import com.ecommerce.cart.persistence.repository.InventoryRepository;
 import com.ecommerce.cart.service.dto.RequestDto;
@@ -24,7 +24,7 @@ public class CartService {
     private final CartRepository cartRepository;
 
     public void upsertCart(String cartId, RequestDto requestDto) {
-        Map<String, LineItem> lineItems = validateInventoryAvailability(requestDto);
+        Map<String, CartItem> lineItems = validateInventoryAvailability(requestDto);
         Cart cart = Cart.createNewCart(cartId, lineItems);
         cartRepository.saveCart(cart);
     }
@@ -32,7 +32,7 @@ public class CartService {
     public void addToCart(String cartId, RequestDto requestDto) {
         Cart cart = cartRepository.findByCartId(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart with ID " + cartId + " is not available"));
-        Map<String, LineItem> lineItems = validateInventoryAvailability(requestDto);
+        Map<String, CartItem> lineItems = validateInventoryAvailability(requestDto);
         cart.mergeItems(lineItems);
         cartRepository.saveCart(cart);
     }
@@ -43,13 +43,13 @@ public class CartService {
        return createResponseDto(cart);
     }
 
-    private Map<String, LineItem> validateInventoryAvailability(RequestDto requestDto) {
-        Map<String, LineItem> lineItemMap = new HashMap<>();
+    private Map<String, CartItem> validateInventoryAvailability(RequestDto requestDto) {
+        Map<String, CartItem> lineItemMap = new HashMap<>();
         for (RequestDto.RequestItemDto eachReqItem : requestDto.getItems()) {
             String itemId = eachReqItem.getItemId();
             InventoryItem inventoryItem = inventoryRepository.findById(itemId)
                     .orElseThrow(() -> new ResourceNotFoundException("Invalid product Id " + itemId));
-            lineItemMap.put(itemId, LineItem.createLineItemFromApi(inventoryItem.getItemId(),
+            lineItemMap.put(itemId, CartItem.createLineItemFromApi(inventoryItem.getItemId(),
                     inventoryItem.getName(),
                     inventoryItem.getPrice(),
                     eachReqItem.getQuantity(),

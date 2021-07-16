@@ -2,7 +2,7 @@ package com.ecommerce.cart.persistence.mapper;
 
 import com.ecommerce.cart.aggregate.inventory.InventoryItem;
 import com.ecommerce.cart.aggregate.scart.Cart;
-import com.ecommerce.cart.aggregate.scart.LineItem;
+import com.ecommerce.cart.aggregate.scart.CartItem;
 import com.ecommerce.cart.persistence.entity.DbEntity;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
-public class DomainToDbEntity {
+public class Mapper {
 
     private static final int BOUND = 10;
 
@@ -26,22 +26,22 @@ public class DomainToDbEntity {
 //                .build();
 //    }
 
-    public DbEntity lineItemToDbEntity(Cart cart, LineItem lineItem) {
+    public DbEntity lineItemToDbEntity(Cart cart, CartItem cartItem) {
         return DbEntity
                 .builder()
                 .partitionKey(cart.getCartId())
-                .sortKey(lineItem.getItemId())
-                .name(lineItem.getName())
-                .quantity(lineItem.getQuantity().getValue())
-                .price(lineItem.getPrice())
+                .sortKey(cartItem.getItemId())
+                .name(cartItem.getName())
+                .quantity(cartItem.getQuantity().getValue())
+                .price(cartItem.getPrice())
                 .build();
     }
 
     public Cart dbEntityToCart(List<DbEntity> dbEntityList) {
-        Map<String, LineItem> lineItems = dbEntityList.stream()
+        Map<String, CartItem> lineItems = dbEntityList.stream()
                 .filter(dbEntity -> !dbEntity.getPartitionKey().equals(dbEntity.getSortKey()))
                 .map(lineItemMapper)
-                .collect(Collectors.toMap(LineItem::getItemId, Function.identity()));
+                .collect(Collectors.toMap(CartItem::getItemId, Function.identity()));
         String cartId = dbEntityList.get(0).getPartitionKey();
         return Cart.createNewCart(cartId, lineItems);
     }
@@ -63,8 +63,8 @@ public class DomainToDbEntity {
                 dbEntity.getQuantity());
     }
 
-    private final Function<DbEntity, LineItem> lineItemMapper = dbEntity ->
-            LineItem.createLineItemFromDb(dbEntity.getSortKey(),
+    private final Function<DbEntity, CartItem> lineItemMapper = dbEntity ->
+            CartItem.createLineItemFromDb(dbEntity.getSortKey(),
                     dbEntity.getName(),
                     dbEntity.getPrice(),
                     dbEntity.getQuantity());

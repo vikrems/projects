@@ -1,7 +1,8 @@
 package com.ecommerce.cart.service.kafka;
 
-import com.ecommerce.cart.aggregate.inventory.InventoryItem;
 import com.ecommerce.cart.persistence.repository.InventoryRepository;
+import com.ecommerce.cart.service.kafka.handler.HandlerFactory;
+import com.ecommerce.cart.service.kafka.handler.MessageHandler;
 import com.ecommerce.cart.service.kafka.message.Message;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class KafkaConsumer {
 
     private final InventoryRepository inventoryRepository;
     private final ObjectMapper objectMapper;
+    private final HandlerFactory handlerFactory;
 
     @KafkaListener(topics = "${spring.kafka.consumer.properties.topic}",
             groupId = "${spring.kafka.consumer.properties.group}")
@@ -26,9 +28,8 @@ public class KafkaConsumer {
         log.info("Received Message: {}", msgStr);
         try {
             Message message = objectMapper.readValue(msgStr, Message.class);
-            InventoryItem inventoryItem = message.getAttributes();
-            inventoryRepository.saveOrUpdate(inventoryItem);
-            log.info(message.toString());
+            MessageHandler messageHandler = handlerFactory.fetchHandler(message.getHeader().getEventType());
+            messageHandler.process(message);
         } catch (IOException e) {
             log.error("Error while deserializing message {}", e.getMessage());
         } finally {

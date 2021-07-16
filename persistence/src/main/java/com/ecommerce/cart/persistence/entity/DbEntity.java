@@ -20,6 +20,7 @@ public class DbEntity {
     private String partitionKey;
 
     @DynamoDBRangeKey
+    @DynamoDBIndexHashKey(globalSecondaryIndexName = "sortKey-index")
     private String sortKey;
 
     @DynamoDBAttribute
