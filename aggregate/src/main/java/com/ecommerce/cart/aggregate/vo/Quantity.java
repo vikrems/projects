@@ -3,16 +3,15 @@ package com.ecommerce.cart.aggregate.vo;
 import com.ecommerce.cart.aggregate.exception.QuantityExceededException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @EqualsAndHashCode
 public class Quantity {
 
     @Getter
     private int value;
     private static final int MAX_QUANTITY = 20;
-
-    public Quantity() {
-    }
 
     public Quantity(int value) {
         validateQuantity(value);
@@ -30,7 +29,8 @@ public class Quantity {
 
     private void validateQuantity(int quantity) {
         if (quantity < 1 || quantity > MAX_QUANTITY) {
-            throw new QuantityExceededException("Shopping cart can have between 1 and 20 items");
+            throw new QuantityExceededException("Shopping cart can have between 1 and 20 items. " +
+                    "Your quantity is " + quantity);
         }
     }
 }

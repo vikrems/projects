@@ -25,7 +25,7 @@ public class ShoppingCartController {
 
     @PatchMapping
     public ResponseEntity<Void> patchCart(@PathVariable("cartId") String cartId,
-                                          @RequestBody @Valid RequestDto requestDto) {
+                                              @RequestBody @Valid RequestDto requestDto) {
         cartService.addToCart(cartId, requestDto);
         return ResponseEntity.noContent().build();
     }

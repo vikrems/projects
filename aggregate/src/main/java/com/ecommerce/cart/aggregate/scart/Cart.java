@@ -31,6 +31,7 @@ public class Cart {
             CartItem newItem = eachItem.getValue();
             items.put(eachItem.getKey(), newItem);
         }
+        computeTotals();
     }
 
     public void reduceQtyIfRequired(String itemId, int inventoryQty) {
