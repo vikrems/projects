@@ -1,9 +1,11 @@
 package com.ecommerce.cart.aggregate.vo;
 
 import com.ecommerce.cart.aggregate.exception.PriceExceededException;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 
+@EqualsAndHashCode
 public class Price {
 
     private final BigDecimal value;

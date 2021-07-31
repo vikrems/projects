@@ -1,4 +1,4 @@
-package com.ecommerce.cart.service.kafka.handler;
+package com.ecommerce.cart.service.cart;
 
 import com.ecommerce.cart.aggregate.inventory.InventoryItem;
 import com.ecommerce.cart.persistence.repository.InventoryRepository;

@@ -43,7 +43,7 @@ public class Mapper {
                 .map(lineItemMapper)
                 .collect(Collectors.toMap(CartItem::getItemId, Function.identity()));
         String cartId = dbEntityList.get(0).getPartitionKey();
-        return Cart.createNewCart(cartId, lineItems);
+        return new Cart(cartId, lineItems);
     }
 
     public DbEntity inventoryToDbEntity(InventoryItem inventoryItem) {
@@ -64,7 +64,7 @@ public class Mapper {
     }
 
     private final Function<DbEntity, CartItem> lineItemMapper = dbEntity ->
-            CartItem.createLineItemFromDb(dbEntity.getSortKey(),
+            new CartItem(dbEntity.getSortKey(),
                     dbEntity.getName(),
                     dbEntity.getPrice(),
                     dbEntity.getQuantity());

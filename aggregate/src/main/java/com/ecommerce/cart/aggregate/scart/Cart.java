@@ -15,22 +15,31 @@ public class Cart {
     private Price totalPrice;
     private Quantity totalQuantity;
 
-    private Cart(String cartId, Map<String, CartItem> items) {
+    public Cart(String cartId, Map<String, CartItem> items) {
         this.cartId = cartId;
         this.items = items;
         computeTotals();
     }
-
-    public static Cart createNewCart(String cartId, Map<String, CartItem> items) {
-        return new Cart(cartId, items);
-    }
-
 
     public void mergeItems(Map<String, CartItem> newItems) {
         for (Map.Entry<String, CartItem> eachItem : newItems.entrySet()) {
             CartItem newItem = eachItem.getValue();
             items.put(eachItem.getKey(), newItem);
         }
+        computeTotals();
+    }
+
+    public void mergeItem(CartItem updatedItem) {
+        CartItem existingItem = items.get(updatedItem.getItemId());
+        if (existingItem.getQuantity().compareTo(updatedItem.getQuantity()) > 0)
+            existingItem.setQuantity(updatedItem.getQuantity());
+        if (existingItem.getPrice().compareTo(updatedItem.getPrice()) != 0)
+            existingItem.setPrice(updatedItem.getPrice());
+        computeTotals();
+    }
+
+    public void deleteCartItem(String itemId) {
+        items.remove(itemId);
         computeTotals();
     }
 

@@ -1,6 +1,6 @@
 package com.ecommerce.cart.aggregate.vo;
 
-import com.ecommerce.cart.aggregate.exception.QuantityExceededException;
+import com.ecommerce.cart.aggregate.exception.InvalidQuantityException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,9 +27,13 @@ public class Quantity {
         return this.value - anotherValue;
     }
 
+    public int compareTo(Quantity anotherValue) {
+        return this.value - anotherValue.getValue();
+    }
+
     private void validateQuantity(int quantity) {
         if (quantity < 1 || quantity > MAX_QUANTITY) {
-            throw new QuantityExceededException("Shopping cart can have between 1 and 20 items. " +
+            throw new InvalidQuantityException("Shopping cart can have between 1 and 20 items. " +
                     "Your quantity is " + quantity);
         }
     }

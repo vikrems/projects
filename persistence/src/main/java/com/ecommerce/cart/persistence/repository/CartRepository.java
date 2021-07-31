@@ -12,6 +12,8 @@ public interface CartRepository {
 
     void saveCartItem(Cart cart, CartItem cartItem);
 
+    void deleteCartItem(Cart cart, CartItem cartItem);
+
     Optional<Cart> findByCartId(String cartId);
 
     List<Cart> findAssociatedCarts(String itemId);

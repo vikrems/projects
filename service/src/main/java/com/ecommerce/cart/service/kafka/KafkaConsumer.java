@@ -1,8 +1,8 @@
 package com.ecommerce.cart.service.kafka;
 
 import com.ecommerce.cart.persistence.repository.InventoryRepository;
-import com.ecommerce.cart.service.kafka.handler.HandlerFactory;
-import com.ecommerce.cart.service.kafka.handler.MessageHandler;
+import com.ecommerce.cart.service.cart.HandlerFactory;
+import com.ecommerce.cart.service.cart.MessageHandler;
 import com.ecommerce.cart.service.kafka.message.Message;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

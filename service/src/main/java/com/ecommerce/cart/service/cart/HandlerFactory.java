@@ -1,4 +1,4 @@
-package com.ecommerce.cart.service.kafka.handler;
+package com.ecommerce.cart.service.cart;
 
 import com.ecommerce.cart.service.kafka.message.EventType;
 import lombok.RequiredArgsConstructor;

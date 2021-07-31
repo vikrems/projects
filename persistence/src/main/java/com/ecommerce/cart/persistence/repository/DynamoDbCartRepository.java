@@ -62,6 +62,11 @@ public class DynamoDbCartRepository implements CartRepository {
     }
 
     @Override
+    public void deleteCartItem(Cart cart, CartItem cartItem) {
+
+    }
+
+    @Override
     public Optional<Cart> findByCartId(String cartId) {
         DynamoDBQueryExpression<DbEntity> queryExpression = new DynamoDBQueryExpression<>();
         DbEntity entity = entityWithPartitionKey(cartId);

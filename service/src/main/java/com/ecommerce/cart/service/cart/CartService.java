@@ -1,5 +1,6 @@
 package com.ecommerce.cart.service.cart;
 
+import com.ecommerce.cart.aggregate.exception.PriceExceededException;
 import com.ecommerce.cart.aggregate.inventory.InventoryItem;
 import com.ecommerce.cart.aggregate.scart.Cart;
 import com.ecommerce.cart.aggregate.scart.CartItem;
@@ -25,7 +26,7 @@ public class CartService {
 
     public void upsertCart(String cartId, RequestDto requestDto) {
         Map<String, CartItem> lineItems = validateInventoryAvailability(requestDto);
-        Cart cart = Cart.createNewCart(cartId, lineItems);
+        Cart cart = new Cart(cartId, lineItems);
         cartRepository.saveCart(cart);
     }
 
@@ -40,22 +41,23 @@ public class CartService {
     public ResponseDto retrieveCart(String cartId) {
         Cart cart = cartRepository.findByCartId(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart with ID " + cartId + " is not available"));
-       return createResponseDto(cart);
+        return createResponseDto(cart);
     }
 
     private Map<String, CartItem> validateInventoryAvailability(RequestDto requestDto) {
-        Map<String, CartItem> lineItemMap = new HashMap<>();
+        Map<String, CartItem> cartItemMap = new HashMap<>();
         for (RequestDto.RequestItemDto eachReqItem : requestDto.getItems()) {
             String itemId = eachReqItem.getItemId();
             InventoryItem inventoryItem = inventoryRepository.findById(itemId)
                     .orElseThrow(() -> new ResourceNotFoundException("Invalid product Id " + itemId));
-            lineItemMap.put(itemId, CartItem.createLineItemFromApi(inventoryItem.getItemId(),
-                    inventoryItem.getName(),
-                    inventoryItem.getPrice(),
-                    eachReqItem.getQuantity(),
-                    inventoryItem.getQuantity()));
+            if (eachReqItem.getQuantity() > inventoryItem.getQuantity())
+                throw new PriceExceededException("Quantity specified for itemId " + itemId
+                        + " exceeds the availability which is " + inventoryItem.getQuantity());
+            CartItem cartItem = new CartItem(itemId, inventoryItem.getName(), inventoryItem.getPrice(),
+                    eachReqItem.getQuantity());
+            cartItemMap.put(itemId, cartItem);
         }
-        return lineItemMap;
+        return cartItemMap;
     }
 
     private ResponseDto createResponseDto(Cart cart) {
