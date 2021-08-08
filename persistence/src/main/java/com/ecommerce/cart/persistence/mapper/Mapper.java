@@ -14,19 +14,7 @@ import java.util.stream.Collectors;
 @Component
 public class Mapper {
 
-    private static final int BOUND = 10;
-
-//    public List<DbEntity> cartToDbEntity(Cart cart) {
-//        DbEntity cartEntity = DbEntity
-//                .builder()
-//                .partitionKey(cart.getCartId())
-//                .sortKey(cart.getCartId())
-//                .gsiKey(new Random().nextInt(BOUND))
-//                .lastUpdatedTime(DateTime.now())
-//                .build();
-//    }
-
-    public DbEntity lineItemToDbEntity(Cart cart, CartItem cartItem) {
+    public DbEntity cartItemToDbEntity(Cart cart, CartItem cartItem) {
         return DbEntity
                 .builder()
                 .partitionKey(cart.getCartId())

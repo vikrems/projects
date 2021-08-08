@@ -37,7 +37,7 @@ public class DynamoDbCartRepository implements CartRepository {
                 String key = primaryKey(cart.getCartId(), eachEntry.getKey());
                 DbEntity existingEntity = existingEntities.get(key);
                 if (notIdentical(newItem, existingEntity)) {
-                    DbEntity newEntityToInsert = mapper.lineItemToDbEntity(cart, newItem);
+                    DbEntity newEntityToInsert = mapper.cartItemToDbEntity(cart, newItem);
                     dynamoDBMapper.save(newEntityToInsert);
                 }
                 if (nonNull(existingEntity))
@@ -49,22 +49,12 @@ public class DynamoDbCartRepository implements CartRepository {
         } else {
             for (Map.Entry<String, CartItem> eachEntry : cart.getItems().entrySet()) {
                 CartItem newItem = eachEntry.getValue();
-                DbEntity newEntityToInsert = mapper.lineItemToDbEntity(cart, newItem);
+                DbEntity newEntityToInsert = mapper.cartItemToDbEntity(cart, newItem);
                 dynamoDBMapper.save(newEntityToInsert);
             }
         }
     }
 
-    @Override
-    public void saveCartItem(Cart cart, CartItem cartItem) {
-        DbEntity dbEntity = mapper.lineItemToDbEntity(cart, cartItem);
-        dynamoDBMapper.save(dbEntity);
-    }
-
-    @Override
-    public void deleteCartItem(Cart cart, CartItem cartItem) {
-
-    }
 
     @Override
     public Optional<Cart> findByCartId(String cartId) {
@@ -93,11 +83,6 @@ public class DynamoDbCartRepository implements CartRepository {
                 .filter(entity -> !entity.getPartitionKey().equals(entity.getSortKey()))
                 .map(dbEntity -> findByCartId(dbEntity.getPartitionKey()).get())
                 .collect(toList());
-    }
-
-    @Override
-    public void delete(String cartId) {
-
     }
 
     private Map<String, DbEntity> existingCartEntities(String cartId) {

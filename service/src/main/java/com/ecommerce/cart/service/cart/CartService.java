@@ -1,6 +1,6 @@
 package com.ecommerce.cart.service.cart;
 
-import com.ecommerce.cart.aggregate.exception.PriceExceededException;
+import com.ecommerce.cart.aggregate.exception.InvalidQuantityException;
 import com.ecommerce.cart.aggregate.inventory.InventoryItem;
 import com.ecommerce.cart.aggregate.scart.Cart;
 import com.ecommerce.cart.aggregate.scart.CartItem;
@@ -51,7 +51,7 @@ public class CartService {
             InventoryItem inventoryItem = inventoryRepository.findById(itemId)
                     .orElseThrow(() -> new ResourceNotFoundException("Invalid product Id " + itemId));
             if (eachReqItem.getQuantity() > inventoryItem.getQuantity())
-                throw new PriceExceededException("Quantity specified for itemId " + itemId
+                throw new InvalidQuantityException("Quantity specified for itemId " + itemId
                         + " exceeds the availability which is " + inventoryItem.getQuantity());
             CartItem cartItem = new CartItem(itemId, inventoryItem.getName(), inventoryItem.getPrice(),
                     eachReqItem.getQuantity());

@@ -2,14 +2,16 @@ package com.ecommerce.cart.aggregate.scart;
 
 import com.ecommerce.cart.aggregate.vo.Price;
 import com.ecommerce.cart.aggregate.vo.Quantity;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 @Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Cart {
 
+    @EqualsAndHashCode.Include
     private final String cartId;
     private final Map<String, CartItem> items;
     private Price totalPrice;
@@ -40,21 +42,6 @@ public class Cart {
 
     public void deleteCartItem(String itemId) {
         items.remove(itemId);
-        computeTotals();
-    }
-
-    public void reduceQtyIfRequired(String itemId, int inventoryQty) {
-        CartItem cartItem = items.get(itemId);
-        int delta = cartItem.getQuantity().compareTo(inventoryQty);
-        if (delta > 0) {
-            Quantity updatedQuantity = new Quantity(inventoryQty);
-            cartItem.setQuantity(updatedQuantity);
-        }
-    }
-
-    public void changePrice(String itemId, BigDecimal inventoryPrice) {
-        CartItem cartItem = items.get(itemId);
-        cartItem.setPrice(inventoryPrice);
         computeTotals();
     }
 
