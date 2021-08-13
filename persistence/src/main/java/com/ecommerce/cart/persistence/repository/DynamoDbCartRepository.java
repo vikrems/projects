@@ -30,13 +30,13 @@ public class DynamoDbCartRepository implements CartRepository {
 
     @Override
     public void saveCart(Cart cart) {
-        Map<String, DbEntity> existingEntities = existingCartEntities(cart.getCartId());
+        Map<String, DbEntity> existingEntities = existingCartEntities(cart.getCartId()); //fetch the existing items in the shopping cart
         if (existingEntities != null) {
             for (Map.Entry<String, CartItem> eachEntry : cart.getItems().entrySet()) {
                 CartItem newItem = eachEntry.getValue();
                 String key = primaryKey(cart.getCartId(), eachEntry.getKey());
                 DbEntity existingEntity = existingEntities.get(key);
-                if (notIdentical(newItem, existingEntity)) {
+                if (notIdentical(newItem, existingEntity)) {  //save item if it has changed or it it is new
                     DbEntity newEntityToInsert = mapper.cartItemToDbEntity(cart, newItem);
                     dynamoDBMapper.save(newEntityToInsert);
                 }
@@ -44,10 +44,10 @@ public class DynamoDbCartRepository implements CartRepository {
                     existingEntities.remove(primaryKey(existingEntity.getPartitionKey(), existingEntity.getSortKey()));
             }
             for (Map.Entry<String, DbEntity> eachEntity : existingEntities.entrySet()) {
-                dynamoDBMapper.delete(eachEntity.getValue());
+                dynamoDBMapper.delete(eachEntity.getValue()); //delete items no longer in shopping cart
             }
         } else {
-            for (Map.Entry<String, CartItem> eachEntry : cart.getItems().entrySet()) {
+            for (Map.Entry<String, CartItem> eachEntry : cart.getItems().entrySet()) { //if the cart id isn't present, save all entities afresh
                 CartItem newItem = eachEntry.getValue();
                 DbEntity newEntityToInsert = mapper.cartItemToDbEntity(cart, newItem);
                 dynamoDBMapper.save(newEntityToInsert);
